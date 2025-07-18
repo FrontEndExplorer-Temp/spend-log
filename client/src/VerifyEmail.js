@@ -25,7 +25,7 @@ function VerifyEmail() {
       }
     }
     verify();
-  }, [token]);
+  }, [API_URL, token]);
 
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow p-8 mt-12 text-center">

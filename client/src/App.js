@@ -88,7 +88,7 @@ function AppContent() {
         }
       })
       .catch(() => setIncomes([]));
-  }, [token]);
+  }, [token, fetchWithAuth]);
 
   // Add expense
   const handleAddExpense = (expense) => {
@@ -198,8 +198,6 @@ function AppContent() {
 
   // Summary calculations
   const totalExpenses = filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
-  const totalIncome = filteredIncomes.reduce((sum, e) => sum + Number(e.amount), 0);
-  const remaining = budget - totalExpenses;
 
   // Filter apply/clear
   const handleApplyFilters = () => setFilters({ ...filters });

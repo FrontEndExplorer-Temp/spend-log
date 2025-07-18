@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
 
 function Register() {
-  const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [verifyMsg, setVerifyMsg] = useState(null);
