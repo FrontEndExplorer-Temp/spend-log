@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from './ToastContext';
 
 function Profile() {
-  const { user, token, logout, fetchWithAuth } = useAuth();
+  const { user, logout, fetchWithAuth } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [emailMsg, setEmailMsg] = useState(null);

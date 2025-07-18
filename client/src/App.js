@@ -196,9 +196,6 @@ function AppContent() {
     });
   }
 
-  // Summary calculations
-  const totalExpenses = filteredExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
-
   // Filter apply/clear
   const handleApplyFilters = () => setFilters({ ...filters });
   const handleClearFilters = () => setFilters({ category: '', startDate: '', endDate: '' });

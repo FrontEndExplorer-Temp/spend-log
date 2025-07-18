@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from './AuthContext';
 
 function Register() {
   const [email, setEmail] = useState('');
