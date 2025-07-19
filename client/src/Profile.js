@@ -134,7 +134,7 @@ function Profile() {
       <h2 className="text-2xl font-bold mb-6 text-center dark:text-gray-100">Profile</h2>
       <div className="flex flex-col items-center mb-6">
         <img
-          src={avatar ? `/images/${avatar}` : '/favicon.ico'}
+          src={avatar ? `https://spend-log-qukd.onrender.com/images/${avatar}` : '/favicon.ico'}
           alt="Avatar"
           className="w-24 h-24 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600 mb-2"
         />
