@@ -19,7 +19,20 @@ const PORT = process.env.PORT || 5000;
 app.use(morgan('combined'));
 app.use(mongoSanitize());
 app.use(xss());
-app.use(cors({ origin: process.env.CORS_ORIGIN?.split(',') || [], credentials: true }));
+app.use(cors({ 
+  origin: process.env.CORS_ORIGIN?.split(',') || [
+    'https://spend-log.netlify.app',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ], 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
