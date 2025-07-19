@@ -40,6 +40,19 @@ if (!process.env.JWT_REFRESH_SECRET) {
 app.use(morgan('combined'));
 app.use(mongoSanitize());
 app.use(xss());
+
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN?.split(',') || [
+    'https://spend-log.netlify.app',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Disposition']
+};
+
 app.use(cors({ 
   origin: process.env.CORS_ORIGIN?.split(',') || [
     'https://spend-log.netlify.app',
@@ -59,7 +72,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
-app.use('/images', express.static(path.join(__dirname, '../assets/images')));
+
+// Add CORS to static images route
+app.use('/images', cors(corsOptions), express.static(path.join(__dirname, '../assets/images')));
 
 // MongoDB connection
 if (!process.env.MONGO_URI) {
