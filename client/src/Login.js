@@ -11,7 +11,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL || '';
+  const API_URL = process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com';
 
   const handleSubmit = async e => {
     e.preventDefault();
