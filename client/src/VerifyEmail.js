@@ -5,7 +5,7 @@ function VerifyEmail() {
   const { token } = useParams();
   const [status, setStatus] = useState('verifying');
   const [message, setMessage] = useState('');
-  const API_URL = process.env.REACT_APP_API_URL || '';
+  const API_URL = process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com';
 
   useEffect(() => {
     async function verify() {
