@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/auth/login`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com'}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
   const register = async (email, password) => {
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/auth/register`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com'}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
 
   // Helper: fetch with auto-refresh
   const fetchWithAuth = async (url, options = {}) => {
-    let res = await fetch(`${process.env.REACT_APP_API_URL || ''}${url.startsWith('/') ? url : '/' + url}`, {
+    let res = await fetch(`${process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com'}${url.startsWith('/') ? url : '/' + url}`, {
       ...options,
       headers: {
         ...(options.headers || {}),
@@ -79,13 +79,13 @@ export function AuthProvider({ children }) {
     });
     if (res.status === 401 || res.status === 403) {
       // Try to refresh token
-      const refreshRes = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/auth/refresh-token`, { method: 'POST', credentials: 'include' });
+      const refreshRes = await fetch(`${process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com'}/api/auth/refresh-token`, { method: 'POST', credentials: 'include' });
       const refreshData = await refreshRes.json();
       if (refreshRes.ok && refreshData.token) {
         setToken(refreshData.token);
         localStorage.setItem('token', refreshData.token);
         // Retry original request with new token
-        res = await fetch(`${process.env.REACT_APP_API_URL || ''}${url.startsWith('/') ? url : '/' + url}`, {
+        res = await fetch(`${process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com'}${url.startsWith('/') ? url : '/' + url}`, {
           ...options,
           headers: {
             ...(options.headers || {}),
