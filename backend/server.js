@@ -22,6 +22,19 @@ console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('MONGO_URI exists:', !!process.env.MONGO_URI);
 console.log('MONGO_URI length:', process.env.MONGO_URI ? process.env.MONGO_URI.length : 0);
+console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+console.log('JWT_REFRESH_SECRET exists:', !!process.env.JWT_REFRESH_SECRET);
+
+// Check for required environment variables
+if (!process.env.JWT_SECRET) {
+  console.error('ERROR: JWT_SECRET environment variable is required but not set!');
+  process.exit(1);
+}
+
+if (!process.env.JWT_REFRESH_SECRET) {
+  console.error('ERROR: JWT_REFRESH_SECRET environment variable is required but not set!');
+  process.exit(1);
+}
 
 // Middleware
 app.use(morgan('combined'));
