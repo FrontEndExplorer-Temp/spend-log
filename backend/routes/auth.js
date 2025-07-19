@@ -5,10 +5,9 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
-const auth = require('../middleware/auth');
+const { auth, isAdmin } = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
-const { isAdmin } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
 // Multer setup for avatar uploads
