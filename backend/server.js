@@ -73,6 +73,12 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
+app.use('/images', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Content-Security-Policy', "default-src *; img-src * data:; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline';");
+  next();
+});
+
 // Add CORS to static images route
 app.use('/images', cors(corsOptions), express.static(path.join(__dirname, '../assets/images')));
 
