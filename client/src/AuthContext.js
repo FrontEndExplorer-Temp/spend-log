@@ -10,7 +10,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      setUser({ email: localStorage.getItem('email'), avatar: localStorage.getItem('avatar') });
+      setUser({
+        email: localStorage.getItem('email'),
+        avatar: localStorage.getItem('avatar'),
+        isAdmin: localStorage.getItem('isAdmin') === 'true',
+      });
     } else {
       setUser(null);
     }
@@ -27,10 +31,11 @@ export function AuthProvider({ children }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Login failed');
       setToken(data.token);
-      setUser({ email: data.email, avatar: data.avatar });
+      setUser({ email: data.email, avatar: data.avatar, isAdmin: data.isAdmin });
       localStorage.setItem('token', data.token);
       localStorage.setItem('email', data.email);
       localStorage.setItem('avatar', data.avatar || '');
+      localStorage.setItem('isAdmin', data.isAdmin ? 'true' : '');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -49,10 +54,11 @@ export function AuthProvider({ children }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Registration failed');
       setToken(data.token);
-      setUser({ email: data.email, avatar: data.avatar });
+      setUser({ email: data.email, avatar: data.avatar, isAdmin: data.isAdmin });
       localStorage.setItem('token', data.token);
       localStorage.setItem('email', data.email);
       localStorage.setItem('avatar', data.avatar || '');
+      localStorage.setItem('isAdmin', data.isAdmin ? 'true' : '');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,6 +72,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
     localStorage.removeItem('avatar');
+    localStorage.removeItem('isAdmin');
   };
 
   // Helper: fetch with auto-refresh
