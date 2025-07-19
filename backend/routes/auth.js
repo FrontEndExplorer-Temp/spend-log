@@ -63,7 +63,7 @@ router.post('/register', [
     await transporter.sendMail({
       to: user.email,
       from: process.env.MAIL_FROM || 'no-reply@expensetracker.com',
-      subject: 'Verify your email',
+      subject: 'Spend Log - Welcome! Please Verify Your Email',
       html: `
         <div style="max-width:480px;margin:0 auto;padding:24px;background:#f9f9f9;border-radius:8px;font-family:sans-serif;color:#222;">
           <div style="text-align:center;">
@@ -71,12 +71,17 @@ router.post('/register', [
             <p style="font-size:16px;margin-bottom:24px;">Track every penny, grow your savings.</p>
           </div>
           <div style="background:#fff;padding:24px 20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-            <p style="font-size:16px;margin-bottom:16px;">Thank you for registering! Please verify your email address.</p>
-            <a href="${verifyUrl}" style="display:inline-block;padding:12px 24px;background:#2d6cdf;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;margin-bottom:16px;">Verify Email</a>
-            <p style="font-size:14px;color:#888;margin-top:24px;">If you did not request this, you can safely ignore this email.</p>
+            <h3 style="color:#2d6cdf;margin-bottom:16px;font-size:18px;">Welcome to Spend Log!</h3>
+            <p style="font-size:16px;margin-bottom:16px;line-height:1.5;">Thank you for creating your account! We're excited to help you take control of your finances and achieve your savings goals.</p>
+            <p style="font-size:16px;margin-bottom:16px;line-height:1.5;">To get started, please verify your email address by clicking the button below. This helps us ensure the security of your account.</p>
+            <a href="${verifyUrl}" style="display:inline-block;padding:12px 24px;background:#2d6cdf;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;margin-bottom:16px;">Verify Email Address</a>
+            <p style="font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;">Once verified, you'll have full access to all our features including expense tracking, income management, and detailed analytics.</p>
+            <p style="font-size:14px;color:#888;margin-top:24px;border-top:1px solid #eee;padding-top:16px;">If the button above doesn't work, you can copy and paste this link into your browser:</p>
+            <p style="font-size:12px;color:#888;word-break:break-all;background:#f8f8f8;padding:8px;border-radius:4px;">${verifyUrl}</p>
           </div>
           <div style="text-align:center;margin-top:32px;font-size:12px;color:#aaa;">
-            &copy; ${new Date().getFullYear()} Spend Log. All rights reserved.
+            <p>&copy; ${new Date().getFullYear()} Spend Log. All rights reserved.</p>
+            <p style="margin-top:8px;">This is an automated message, please do not reply to this email.</p>
           </div>
         </div>
       `
@@ -113,26 +118,59 @@ router.post('/login', [
   next();
 }, async (req, res) => {
   const { email, password } = req.body;
+  
+  // Check for required environment variables
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET environment variable is missing');
+    return res.status(500).json({ message: 'Server configuration error' });
+  }
+  
+  if (!process.env.JWT_REFRESH_SECRET) {
+    console.error('JWT_REFRESH_SECRET environment variable is missing');
+    return res.status(500).json({ message: 'Server configuration error' });
+  }
+  
   try {
+    console.log('Login attempt for email:', email);
+    
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
-    if (!user.isVerified) return res.status(403).json({ message: 'Please verify your email before logging in.' });
+    if (!user) {
+      console.log('User not found for email:', email);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    
+    if (!user.isVerified) {
+      console.log('Unverified user attempt to login:', email);
+      return res.status(403).json({ message: 'Please verify your email before logging in.' });
+    }
+    
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!match) {
+      console.log('Invalid password for user:', email);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    
+    console.log('Generating tokens for user:', user._id);
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
+    
     user.refreshTokens = user.refreshTokens || [];
     user.refreshTokens.push(refreshToken);
     await user.save();
+    
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
+    
+    console.log('Login successful for user:', email);
     res.json({ token: accessToken, email: user.email, avatar: user.avatar });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Login error:', err);
+    console.error('Error stack:', err.stack);
+    res.status(500).json({ message: 'Internal server error during login' });
   }
 });
 
@@ -202,7 +240,7 @@ router.post('/forgot-password', [
     await transporter.sendMail({
       to: user.email,
       from: process.env.MAIL_FROM || 'no-reply@expensetracker.com',
-      subject: 'Password Reset',
+      subject: 'Spend Log - Password Reset Request',
       html: `
         <div style="max-width:480px;margin:0 auto;padding:24px;background:#f9f9f9;border-radius:8px;font-family:sans-serif;color:#222;">
           <div style="text-align:center;">
@@ -210,12 +248,17 @@ router.post('/forgot-password', [
             <p style="font-size:16px;margin-bottom:24px;">Track every penny, grow your savings.</p>
           </div>
           <div style="background:#fff;padding:24px 20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-            <p style="font-size:16px;margin-bottom:16px;">You requested a password reset. Click the button below to reset your password. This link is valid for 1 hour.</p>
+            <h3 style="color:#2d6cdf;margin-bottom:16px;font-size:18px;">Password Reset Request</h3>
+            <p style="font-size:16px;margin-bottom:16px;line-height:1.5;">We received a request to reset the password for your Spend Log account. To proceed with the password reset, please click the button below.</p>
             <a href="${resetUrl}" style="display:inline-block;padding:12px 24px;background:#2d6cdf;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;margin-bottom:16px;">Reset Password</a>
-            <p style="font-size:14px;color:#888;margin-top:24px;">If you did not request this, you can safely ignore this email.</p>
+            <p style="font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;"><strong>Important:</strong> This link will expire in 1 hour for security reasons. If you don't reset your password within this time, you'll need to request a new reset link.</p>
+            <p style="font-size:14px;color:#888;margin-top:24px;border-top:1px solid #eee;padding-top:16px;">If the button above doesn't work, you can copy and paste this link into your browser:</p>
+            <p style="font-size:12px;color:#888;word-break:break-all;background:#f8f8f8;padding:8px;border-radius:4px;">${resetUrl}</p>
+            <p style="font-size:14px;color:#888;margin-top:16px;">If you did not request this password reset, you can safely ignore this email. Your password will remain unchanged.</p>
           </div>
           <div style="text-align:center;margin-top:32px;font-size:12px;color:#aaa;">
-            &copy; ${new Date().getFullYear()} Spend Log. All rights reserved.
+            <p>&copy; ${new Date().getFullYear()} Spend Log. All rights reserved.</p>
+            <p style="margin-top:8px;">This is an automated message, please do not reply to this email.</p>
           </div>
         </div>
       `
@@ -346,8 +389,27 @@ router.post('/resend-verification', [
     await transporter.sendMail({
       to: user.email,
       from: process.env.MAIL_FROM || 'no-reply@expensetracker.com',
-      subject: 'Verify your email',
-      html: `<p>Click <a href="${verifyUrl}">here</a> to verify your email.</p>`
+      subject: 'Spend Log - Email Verification Required',
+      html: `
+        <div style="max-width:480px;margin:0 auto;padding:24px;background:#f9f9f9;border-radius:8px;font-family:sans-serif;color:#222;">
+          <div style="text-align:center;">
+            <h2 style="color:#2d6cdf;margin-bottom:8px;">Spend Log</h2>
+            <p style="font-size:16px;margin-bottom:24px;">Track every penny, grow your savings.</p>
+          </div>
+          <div style="background:#fff;padding:24px 20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <h3 style="color:#2d6cdf;margin-bottom:16px;font-size:18px;">Email Verification Required</h3>
+            <p style="font-size:16px;margin-bottom:16px;line-height:1.5;">We received a request to resend your email verification. To complete your account setup and start tracking your expenses, please verify your email address by clicking the button below.</p>
+            <a href="${verifyUrl}" style="display:inline-block;padding:12px 24px;background:#2d6cdf;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;margin-bottom:16px;">Verify Email Address</a>
+            <p style="font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;">This verification link will remain active for your convenience. If you did not request this verification email, you can safely ignore this message.</p>
+            <p style="font-size:14px;color:#888;margin-top:24px;border-top:1px solid #eee;padding-top:16px;">If the button above doesn't work, you can copy and paste this link into your browser:</p>
+            <p style="font-size:12px;color:#888;word-break:break-all;background:#f8f8f8;padding:8px;border-radius:4px;">${verifyUrl}</p>
+          </div>
+          <div style="text-align:center;margin-top:32px;font-size:12px;color:#aaa;">
+            <p>&copy; ${new Date().getFullYear()} Spend Log. All rights reserved.</p>
+            <p style="margin-top:8px;">This is an automated message, please do not reply to this email.</p>
+          </div>
+        </div>
+      `
     });
     res.json({ message: 'Verification email resent. Please check your inbox.' });
   } catch (err) {
