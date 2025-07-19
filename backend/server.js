@@ -59,12 +59,8 @@ console.log('MongoDB URI (first 50 chars):', process.env.MONGO_URI.substring(0, 
 mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
-  bufferCommands: false,
-  bufferMaxEntries: 0,
   maxPoolSize: 10,
-  minPoolSize: 1,
-  retryWrites: true,
-  w: 'majority'
+  minPoolSize: 1
 })
 .then(() => {
   console.log('MongoDB connected successfully');
