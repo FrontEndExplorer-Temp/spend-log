@@ -53,15 +53,27 @@ if (!process.env.MONGO_URI) {
   process.exit(1);
 }
 
+console.log('Attempting to connect to MongoDB...');
+console.log('MongoDB URI (first 50 chars):', process.env.MONGO_URI.substring(0, 50) + '...');
+
 mongoose.connect(process.env.MONGO_URI, {
-  serverSelectionTimeoutMS: 5000,
+  serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
   bufferCommands: false,
-  bufferMaxEntries: 0
+  bufferMaxEntries: 0,
+  maxPoolSize: 10,
+  minPoolSize: 1,
+  retryWrites: true,
+  w: 'majority'
 })
-.then(() => console.log('MongoDB connected successfully'))
+.then(() => {
+  console.log('MongoDB connected successfully');
+  console.log('Database name:', mongoose.connection.db.databaseName);
+})
 .catch((err) => {
   console.error('MongoDB connection error:', err);
+  console.error('Error name:', err.name);
+  console.error('Error message:', err.message);
   process.exit(1);
 });
 
@@ -90,6 +102,17 @@ try {
 
 app.get('/', (req, res) => {
   res.send('Expense Tracker API');
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  const health = {
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: process.env.NODE_ENV || 'development'
+  };
+  res.json(health);
 });
 
 // Centralized error handler
