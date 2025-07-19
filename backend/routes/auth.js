@@ -165,7 +165,7 @@ router.post('/login', [
     });
     
     console.log('Login successful for user:', email);
-    res.json({ token: accessToken, email: user.email, avatar: user.avatar });
+    res.json({ token: accessToken, email: user.email, avatar: user.avatar, isAdmin: user.isAdmin });
   } catch (err) {
     console.error('Login error:', err);
     console.error('Error stack:', err.stack);
