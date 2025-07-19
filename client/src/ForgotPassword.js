@@ -10,7 +10,7 @@ function ForgotPassword({ onSent }) {
     e.preventDefault();
     setLoading(true); setError(null); setMessage(null);
     try {
-      const res = await fetch('/api/auth/forgot-password', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'https://spend-log-qukd.onrender.com'}/api/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
