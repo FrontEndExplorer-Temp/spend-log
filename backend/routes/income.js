@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Income = require('../models/Income');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
 // Get all income for the logged-in user
