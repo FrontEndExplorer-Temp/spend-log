@@ -20,6 +20,8 @@ console.log('Environment check:');
 console.log('CORS_ORIGIN:', process.env.CORS_ORIGIN);
 console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
 console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('MONGO_URI exists:', !!process.env.MONGO_URI);
+console.log('MONGO_URI length:', process.env.MONGO_URI ? process.env.MONGO_URI.length : 0);
 
 // Middleware
 app.use(morgan('combined'));
@@ -46,9 +48,22 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 app.use('/images', express.static(path.join(__dirname, '../assets/images')));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+if (!process.env.MONGO_URI) {
+  console.error('MONGO_URI environment variable is not set!');
+  process.exit(1);
+}
+
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  bufferCommands: false,
+  bufferMaxEntries: 0
+})
+.then(() => console.log('MongoDB connected successfully'))
+.catch((err) => {
+  console.error('MongoDB connection error:', err);
+  process.exit(1);
+});
 
 // Expense routes placeholder
 app.use('/api/expenses', require('./routes/expenses'));
