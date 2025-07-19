@@ -15,6 +15,12 @@ const xss = require('xss-clean');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Debug environment variables that might cause path-to-regexp issues
+console.log('Environment check:');
+console.log('CORS_ORIGIN:', process.env.CORS_ORIGIN);
+console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
 // Middleware
 app.use(morgan('combined'));
 app.use(mongoSanitize());
@@ -49,17 +55,23 @@ app.use('/api/expenses', require('./routes/expenses'));
 app.use('/api/income', require('./routes/income'));
 app.use('/api/auth', require('./routes/auth'));
 
-const swaggerSpec = swaggerJSDoc({
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Expense Tracker API',
-      version: '1.0.0',
+// Swagger configuration
+try {
+  const swaggerSpec = swaggerJSDoc({
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'Expense Tracker API',
+        version: '1.0.0',
+      },
     },
-  },
-  apis: ['./backend/routes/*.js'],
-});
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    apis: ['./routes/*.js'],
+  });
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+} catch (error) {
+  console.error('Swagger configuration error:', error);
+  // Continue without Swagger if there's an error
+}
 
 app.get('/', (req, res) => {
   res.send('Expense Tracker API');
