@@ -1,7 +1,8 @@
 # 💸 Spend Log
 
-[![Live Site](https://img.shields.io/badge/Live%20Site-spend--log.netlify.app-blue?style=for-the-badge&logo=netlify)](https://spend-log.netlify.app/)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/77d4b53a-49b5-4d5b-92b0-60c5b7ab0e8b/deploy-status)](https://app.netlify.com/projects/spend-log/deploys)
+> [![Live Site](https://img.shields.io/badge/Live%20Site-spend--log.netlify.app-blue?style=for-the-badge&logo=netlify)](https://spend-log.netlify.app/)
+
+> [![Netlify Status](https://api.netlify.com/api/v1/badges/77d4b53a-49b5-4d5b-92b0-60c5b7ab0e8b/deploy-status)](https://app.netlify.com/projects/spend-log/deploys)
 
 _Track every penny, grow your savings._
 
