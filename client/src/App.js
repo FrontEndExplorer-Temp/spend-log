@@ -18,7 +18,7 @@ import Register from './Register';
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
 import { useAuth } from './AuthContext';
-import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import Profile from './Profile';
 import SummaryTrendsChart from './SummaryTrendsChart';
 import VerifyEmail from './VerifyEmail';
@@ -27,7 +27,6 @@ import BudgetProgressBar from './BudgetProgressBar';
 import DatePeriodSelector from './DatePeriodSelector';
 import { useToast } from './ToastContext';
 import AdminPanel from './AdminPanel';
-import DarkModeToggle from './DarkModeToggle';
 import Navbar from './Navbar';
 
 function ResetPasswordWrapper() {
@@ -35,11 +34,10 @@ function ResetPasswordWrapper() {
   return <ResetPassword token={token} />;
 }
 
-function AppContent({ user, logout, darkMode, setDarkMode }) {
-  const { token, fetchWithAuth } = useAuth();
+function AppContent() {
+  const { user, token, fetchWithAuth } = useAuth();
   const [showLogin, setShowLogin] = useState(true);
   const [showForgot, setShowForgot] = useState(false);
-  const navigate = useNavigate();
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
   const [budget, setBudget] = useState(() => {
@@ -54,6 +52,9 @@ function AppContent({ user, logout, darkMode, setDarkMode }) {
   const now = new Date();
   const [period, setPeriod] = useState({ type: 'month', month: now.getMonth(), year: now.getFullYear(), startDate: '', endDate: '' });
   const { showToast } = useToast();
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
 
   useEffect(() => {
     if (darkMode) {
@@ -236,7 +237,7 @@ function AppContent({ user, logout, darkMode, setDarkMode }) {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      <Navbar user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />
       <main className="max-w-4xl mx-auto px-4 py-8">
         <DatePeriodSelector {...period} onChange={setPeriod} expenses={expenses} incomes={incomes} />
         <SummaryCards income={periodIncomes.reduce((sum, e) => sum + Number(e.amount), 0)} expenses={periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} budget={budget} remaining={budget - periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} />
@@ -299,18 +300,15 @@ function App() {
   }, [darkMode]);
 
   return (
-    <>
-      <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
-      <Router>
-        <Routes>
-          <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
-          <Route path="/profile" element={<Profile user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
-          <Route path="/verify-email/:token" element={<VerifyEmail />} />
-          <Route path="/admin" element={<AdminPanel user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
-          <Route path="*" element={<AppContent user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
-        </Routes>
-      </Router>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
+        <Route path="/profile" element={<Profile user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
+        <Route path="/admin" element={<AdminPanel user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
+        <Route path="*" element={<AppContent />} />
+      </Routes>
+    </Router>
   );
 }
 

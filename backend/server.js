@@ -108,7 +108,7 @@ mongoose.connect(process.env.MONGO_URI, {
   process.exit(1);
 });
 
-// Expense routes placeholder
+// Temporarily comment out routes to isolate the issue
 app.use('/api/expenses', require('./routes/expenses'));
 app.use('/api/income', require('./routes/income'));
 app.use('/api/auth', require('./routes/auth'));

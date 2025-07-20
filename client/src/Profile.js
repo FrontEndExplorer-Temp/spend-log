@@ -132,7 +132,7 @@ function Profile({ user, logout, darkMode, setDarkMode }) {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      <Navbar user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} activeTab="expenses" setActiveTab={() => {}} />
       <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow p-8 mt-12">
         <h2 className="text-2xl font-bold mb-6 text-center dark:text-gray-100">Profile</h2>
         <div className="flex flex-col items-center mb-6">
