@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
+import { useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
 
-function AdminPanel() {
-  const { fetchWithAuth, user } = useAuth();
+function AdminPanel({ user, logout, darkMode, setDarkMode }) {
+  const { fetchWithAuth, user: currentUser } = useAuth();
   const { showToast } = useToast();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -46,30 +49,31 @@ function AdminPanel() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">Admin Panel</h2>
-      {loading ? <div>Loading...</div> : (
-        <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-blue-100 rounded-xl p-4 text-center">
-              <div className="text-lg font-semibold">Users</div>
-              <div className="text-2xl font-bold">{stats?.userCount ?? '-'}</div>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <Navbar user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div className="max-w-4xl mx-auto p-8 text-gray-900 dark:text-gray-100">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">Admin Panel</h2>
+        {loading ? <div>Loading...</div> : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-blue-100 dark:bg-blue-900 text-gray-900 dark:text-blue-100 rounded-xl p-4 text-center">
+                <div className="text-lg font-semibold">Users</div>
+                <div className="text-2xl font-bold">{stats?.userCount ?? '-'}</div>
+              </div>
+              <div className="bg-green-100 dark:bg-green-900 text-gray-900 dark:text-green-100 rounded-xl p-4 text-center">
+                <div className="text-lg font-semibold">Verified</div>
+                <div className="text-2xl font-bold">{stats?.verifiedCount ?? '-'}</div>
+              </div>
+              <div className="bg-yellow-100 dark:bg-yellow-900 text-gray-900 dark:text-yellow-100 rounded-xl p-4 text-center">
+                <div className="text-lg font-semibold">Expenses</div>
+                <div className="text-2xl font-bold">{stats?.expenseCount ?? '-'}</div>
+              </div>
+              <div className="bg-purple-100 dark:bg-purple-900 text-gray-900 dark:text-purple-100 rounded-xl p-4 text-center">
+                <div className="text-lg font-semibold">Incomes</div>
+                <div className="text-2xl font-bold">{stats?.incomeCount ?? '-'}</div>
+              </div>
             </div>
-            <div className="bg-green-100 rounded-xl p-4 text-center">
-              <div className="text-lg font-semibold">Verified</div>
-              <div className="text-2xl font-bold">{stats?.verifiedCount ?? '-'}</div>
-            </div>
-            <div className="bg-yellow-100 rounded-xl p-4 text-center">
-              <div className="text-lg font-semibold">Expenses</div>
-              <div className="text-2xl font-bold">{stats?.expenseCount ?? '-'}</div>
-            </div>
-            <div className="bg-purple-100 rounded-xl p-4 text-center">
-              <div className="text-lg font-semibold">Incomes</div>
-              <div className="text-2xl font-bold">{stats?.incomeCount ?? '-'}</div>
-            </div>
-          </div>
-          <h3 className="text-xl font-bold mb-4">Users</h3>
-          <div className="overflow-x-auto">
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Users</h3>
             <table className="min-w-full bg-white dark:bg-gray-800 rounded-xl shadow">
               <thead>
                 <tr>
@@ -94,9 +98,9 @@ function AdminPanel() {
                 ))}
               </tbody>
             </table>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

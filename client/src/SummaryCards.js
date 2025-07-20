@@ -15,7 +15,7 @@ function SummaryCards({ income, expenses, budget, remaining }) {
         <h2 className="text-lg font-semibold mb-2">Budget Limit</h2>
         <h3 className="text-2xl font-bold">₹ {budget}</h3>
       </div>
-      <div className="bg-gray-800 dark:bg-gray-900 text-white rounded-xl shadow p-6 flex flex-col items-center">
+      <div className="bg-teal-600 dark:bg-indigo-800 text-white rounded-xl shadow p-6 flex flex-col items-center">
         <h2 className="text-lg font-semibold mb-2">Net Balance</h2>
         <h3 className="text-2xl font-bold">₹ {income - expenses}</h3>
       </div>

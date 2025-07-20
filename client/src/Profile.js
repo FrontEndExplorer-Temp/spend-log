@@ -5,10 +5,11 @@ import Spinner from './Spinner';
 import SkeletonProfile from './SkeletonProfile';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from './ToastContext';
+import Navbar from './Navbar';
 
-function Profile() {
-  const { user, logout, fetchWithAuth } = useAuth();
+function Profile({ user, logout, darkMode, setDarkMode }) {
   const navigate = useNavigate();
+  const { fetchWithAuth } = useAuth();
   const [email, setEmail] = useState("");
   const [emailMsg, setEmailMsg] = useState(null);
   const [emailErr, setEmailErr] = useState(null);
@@ -130,54 +131,57 @@ function Profile() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow p-8 mt-12">
-      <h2 className="text-2xl font-bold mb-6 text-center dark:text-gray-100">Profile</h2>
-      <div className="flex flex-col items-center mb-6">
-        <img
-          src={avatar ? `https://spend-log-qukd.onrender.com/images/${avatar}` : '/favicon.ico'}
-          alt="Avatar"
-          className="w-24 h-24 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600 mb-2"
-        />
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleAvatarChange}
-        />
-        <button
-          type="button"
-          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded mb-2 hover:bg-gray-300 dark:hover:bg-gray-600"
-          onClick={() => fileInputRef.current.click()}
-          disabled={avatarLoading}
-        >
-          {avatarLoading ? <Spinner className="h-5 w-5" /> : 'Change Avatar'}
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <Navbar user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />
+      <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow p-8 mt-12">
+        <h2 className="text-2xl font-bold mb-6 text-center dark:text-gray-100">Profile</h2>
+        <div className="flex flex-col items-center mb-6">
+          <img
+            src={avatar ? `https://spend-log-qukd.onrender.com/images/${avatar}` : '/favicon.ico'}
+            alt="Avatar"
+            className="w-24 h-24 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600 mb-2"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleAvatarChange}
+          />
+          <button
+            type="button"
+            className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded mb-2 hover:bg-gray-300 dark:hover:bg-gray-600"
+            onClick={() => fileInputRef.current.click()}
+            disabled={avatarLoading}
+          >
+            {avatarLoading ? <Spinner className="h-5 w-5" /> : 'Change Avatar'}
+          </button>
+          {avatarMsg && <div className="text-green-600 text-center">{avatarMsg}</div>}
+          {avatarErr && <div className="text-red-500 text-center">{avatarErr}</div>}
+        </div>
+        <form onSubmit={handleEmailUpdate} className="mb-8">
+          <label className="block mb-1 dark:text-gray-200">Email</label>
+          <input type="email" className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mb-2 dark:bg-gray-900 dark:text-white" value={email} onChange={e => setEmail(e.target.value)} required />
+          {emailMsg && <div className="mb-2 text-green-600 text-center">{emailMsg}</div>}
+          {emailErr && <div className="mb-2 text-red-500 text-center">{emailErr}</div>}
+          <button type="submit" className="w-full bg-blue-500 dark:bg-blue-700 text-white rounded px-3 py-2 font-semibold hover:bg-blue-600 dark:hover:bg-blue-800 transition mb-2" disabled={loading}>Update Email</button>
+        </form>
+        <form onSubmit={handlePasswordUpdate}>
+          <label className="block mb-1 dark:text-gray-200">Current Password</label>
+          <input type="password" className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mb-2 dark:bg-gray-900 dark:text-white" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+          <label className="block mb-1 dark:text-gray-200">New Password</label>
+          <input type="password" className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mb-2 dark:bg-gray-900 dark:text-white" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
+          {pwMsg && <div className="mb-2 text-green-600 text-center">{pwMsg}</div>}
+          {pwErr && <div className="mb-2 text-red-500 text-center">{pwErr}</div>}
+          <button type="submit" className="w-full bg-green-500 dark:bg-green-700 text-white rounded px-3 py-2 font-semibold hover:bg-green-600 dark:hover:bg-green-800 transition" disabled={loading}>Update Password</button>
+        </form>
+        <button className="w-full mt-6 bg-red-500 dark:bg-red-700 text-white rounded px-3 py-2 font-semibold hover:bg-red-600 dark:hover:bg-red-800 transition" onClick={logout}>Logout</button>
+        <button className="w-full mt-3 bg-red-700 dark:bg-red-900 text-white rounded px-3 py-2 font-semibold hover:bg-red-800 dark:hover:bg-red-950 transition" onClick={handleDeleteAccount} disabled={deleteLoading}>
+          {deleteLoading ? 'Deleting...' : 'Delete Account'}
         </button>
-        {avatarMsg && <div className="text-green-600 text-center">{avatarMsg}</div>}
-        {avatarErr && <div className="text-red-500 text-center">{avatarErr}</div>}
+        {deleteMsg && <div className="text-green-600 text-center mt-2">{deleteMsg}</div>}
+        {deleteErr && <div className="text-red-500 text-center mt-2">{deleteErr}</div>}
       </div>
-      <form onSubmit={handleEmailUpdate} className="mb-8">
-        <label className="block mb-1 dark:text-gray-200">Email</label>
-        <input type="email" className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mb-2 dark:bg-gray-900 dark:text-white" value={email} onChange={e => setEmail(e.target.value)} required />
-        {emailMsg && <div className="mb-2 text-green-600 text-center">{emailMsg}</div>}
-        {emailErr && <div className="mb-2 text-red-500 text-center">{emailErr}</div>}
-        <button type="submit" className="w-full bg-blue-500 dark:bg-blue-700 text-white rounded px-3 py-2 font-semibold hover:bg-blue-600 dark:hover:bg-blue-800 transition mb-2" disabled={loading}>Update Email</button>
-      </form>
-      <form onSubmit={handlePasswordUpdate}>
-        <label className="block mb-1 dark:text-gray-200">Current Password</label>
-        <input type="password" className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mb-2 dark:bg-gray-900 dark:text-white" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
-        <label className="block mb-1 dark:text-gray-200">New Password</label>
-        <input type="password" className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 mb-2 dark:bg-gray-900 dark:text-white" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
-        {pwMsg && <div className="mb-2 text-green-600 text-center">{pwMsg}</div>}
-        {pwErr && <div className="mb-2 text-red-500 text-center">{pwErr}</div>}
-        <button type="submit" className="w-full bg-green-500 dark:bg-green-700 text-white rounded px-3 py-2 font-semibold hover:bg-green-600 dark:hover:bg-green-800 transition" disabled={loading}>Update Password</button>
-      </form>
-      <button className="w-full mt-6 bg-red-500 dark:bg-red-700 text-white rounded px-3 py-2 font-semibold hover:bg-red-600 dark:hover:bg-red-800 transition" onClick={logout}>Logout</button>
-      <button className="w-full mt-3 bg-red-700 dark:bg-red-900 text-white rounded px-3 py-2 font-semibold hover:bg-red-800 dark:hover:bg-red-950 transition" onClick={handleDeleteAccount} disabled={deleteLoading}>
-        {deleteLoading ? 'Deleting...' : 'Delete Account'}
-      </button>
-      {deleteMsg && <div className="text-green-600 text-center mt-2">{deleteMsg}</div>}
-      {deleteErr && <div className="text-red-500 text-center mt-2">{deleteErr}</div>}
     </div>
   );
 }

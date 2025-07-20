@@ -1,32 +1,35 @@
-# �� Spend Log
+# 💸 Spend Log
+
+[![Live Site](https://img.shields.io/badge/Live%20Site-spend--log.netlify.app-blue?style=for-the-badge&logo=netlify)](https://spend-log.netlify.app/)
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/77d4b53a-49b5-4d5b-92b0-60c5b7ab0e8b/deploy-status)](https://app.netlify.com/projects/spend-log/deploys)
 
 _Track every penny, grow your savings._
 
-A full-stack, responsive web app to manage your daily expenses. Built with **React** (frontend) and **Node.js/Express + MongoDB** (backend). Secure authentication, persistent storage, and modern UI.
+Spend Log is a modern, full-stack web app for managing your daily expenses and income. Built with **React** (frontend) and **Node.js/Express + MongoDB** (backend), it features secure authentication, persistent storage, and a beautiful, responsive UI.
 
 ---
 
-## 📸 Demo
+## 🎬 Live Demo
 
-![Screenshot of Spend Log](./assets/images/screenshot.PNG)
+![Spend Log Demo](./screencapture.gif)
 
 ---
 
 ## ✨ Features
 
-- ✅ Register, login, and email verification
-- ✅ Add, edit, and delete expenses and income
-- ✅ Filter and search by category, date, or name
-- ✅ Set and visualize a monthly budget
-- ✅ Real-time totals and summaries
-- ✅ Export data to **CSV** and **PDF**
-- ✅ Responsive design with dark mode
-- ✅ Visual reports using Chart.js
-- ✅ Secure JWT authentication, password hashing, and rate limiting
+- 🔐 **Authentication:** Register, login, email verification, and password reset
+- 💸 **Expense & Income Tracking:** Add, edit, and delete entries
+- 🔎 **Smart Filters:** Filter and search by category, date, or name
+- 📊 **Visual Reports:** Pie, bar, and trend charts with Chart.js
+- 🎯 **Budgeting:** Set and visualize a monthly budget
+- 📤 **Export:** Download your data as CSV or PDF
+- 🌙 **Dark Mode:** Beautiful, accessible design for day or night
+- 🛡️ **Security:** JWT authentication, password hashing, rate limiting, and more
 
 ---
 
-## 🧰 Tech Stack
+## 🛠️ Tech Stack
 
 - **Frontend:** React, Tailwind CSS, Chart.js
 - **Backend:** Node.js, Express, MongoDB (Mongoose)
@@ -35,7 +38,7 @@ A full-stack, responsive web app to manage your daily expenses. Built with **Rea
 
 ---
 
-## 📦 Project Structure
+## 📁 Project Structure
 
 ```
 ├── backend/         # Express API & MongoDB models
@@ -47,6 +50,7 @@ A full-stack, responsive web app to manage your daily expenses. Built with **Rea
 │   ├── src/
 │   └── public/
 ├── assets/          # Images, screenshots
+├── screencapture.gif # Demo animation
 ├── .gitignore
 ├── README.md
 └── ...
@@ -80,7 +84,6 @@ FRONTEND_URL=http://localhost:3000
 
 ### 3. **Install dependencies**
 ```bash
-# In the root directory
 cd backend && npm install
 cd ../client && npm install
 ```
@@ -103,7 +106,7 @@ npm start
 
 ---
 
-## 🌐 Deployment (Personal Project Tips)
+## 🌐 Deployment
 - **Frontend:** Deploy to [Netlify](https://netlify.com) or [Vercel](https://vercel.com)
 - **Backend:** Deploy to [Render](https://render.com), [Railway](https://railway.app), or [Heroku](https://heroku.com)
 - **MongoDB:** Use [MongoDB Atlas](https://www.mongodb.com/atlas) (free tier)
@@ -112,7 +115,7 @@ npm start
 ---
 
 ## 🔒 Security & Best Practices
-- `.gitignore` is set up to protect `.env`, `node_modules`, and build files
+- `.gitignore` protects `.env`, `node_modules`, and build files
 - Use strong passwords for your database and email
 - Update dependencies regularly
 - Never share your MongoDB URI or secrets publicly
@@ -121,6 +124,12 @@ npm start
 
 ## 📝 API Documentation
 - Swagger UI available at: `http://localhost:5000/api-docs`
+
+---
+
+## 🧑‍💻 Contributing
+
+Contributions are welcome! Please open an issue or pull request for bug fixes, features, or suggestions.
 
 ---
 

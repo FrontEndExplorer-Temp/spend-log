@@ -27,14 +27,16 @@ import BudgetProgressBar from './BudgetProgressBar';
 import DatePeriodSelector from './DatePeriodSelector';
 import { useToast } from './ToastContext';
 import AdminPanel from './AdminPanel';
+import DarkModeToggle from './DarkModeToggle';
+import Navbar from './Navbar';
 
 function ResetPasswordWrapper() {
   const { token } = useParams();
   return <ResetPassword token={token} />;
 }
 
-function AppContent() {
-  const { user, token, logout, fetchWithAuth } = useAuth();
+function AppContent({ user, logout, darkMode, setDarkMode }) {
+  const { token, fetchWithAuth } = useAuth();
   const [showLogin, setShowLogin] = useState(true);
   const [showForgot, setShowForgot] = useState(false);
   const navigate = useNavigate();
@@ -48,9 +50,6 @@ function AppContent() {
   const [incomeFilters, setIncomeFilters] = useState({ category: '', startDate: '', endDate: '' });
   const [search, setSearch] = useState('');
   const [incomeSearch, setIncomeSearch] = useState('');
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('darkMode') === 'true';
-  });
   const [activeTab, setActiveTab] = useState('expenses');
   const now = new Date();
   const [period, setPeriod] = useState({ type: 'month', month: now.getMonth(), year: now.getFullYear(), startDate: '', endDate: '' });
@@ -237,52 +236,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-10 transition-colors duration-300">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">Spend Log</h1>
-          <span className="block text-sm text-gray-500 dark:text-gray-300 ml-1">Track every penny, grow your savings.</span>
-          <div className="flex gap-2 items-center">
-            <span className="text-sm text-gray-600 dark:text-gray-300">{user.email}</span>
-            <button
-              className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded px-3 py-2 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-              onClick={() => setDarkMode(dm => !dm)}
-            >
-              {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-            </button>
-            <button
-              className="bg-red-500 dark:bg-red-700 text-white rounded px-3 py-2 font-semibold hover:bg-red-600 dark:hover:bg-red-800 transition"
-              onClick={logout}
-            >
-              Logout
-            </button>
-            <button
-              className="bg-purple-500 dark:bg-purple-700 text-white rounded px-3 py-2 font-semibold hover:bg-purple-600 dark:hover:bg-purple-800 transition"
-              onClick={() => navigate('/profile')}
-            >
-              Profile
-            </button>
-            {user?.isAdmin && (
-              <button className="bg-yellow-500 dark:bg-yellow-700 text-white rounded px-3 py-2 font-semibold hover:bg-yellow-600 dark:hover:bg-yellow-800 transition" onClick={() => navigate('/admin')}>Admin</button>
-            )}
-          </div>
-        </div>
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex gap-2 mt-4">
-            <button
-              className={`flex-1 py-2 rounded-t-lg font-semibold transition-colors duration-200 ${activeTab === 'expenses' ? 'bg-blue-500 text-white dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-              onClick={() => setActiveTab('expenses')}
-            >
-              Expenses
-            </button>
-            <button
-              className={`flex-1 py-2 rounded-t-lg font-semibold transition-colors duration-200 ${activeTab === 'income' ? 'bg-green-500 text-white dark:bg-green-700' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'}`}
-              onClick={() => setActiveTab('income')}
-            >
-              Income
-            </button>
-          </div>
-        </div>
-      </header>
+      <Navbar user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />
       <main className="max-w-4xl mx-auto px-4 py-8">
         <DatePeriodSelector {...period} onChange={setPeriod} expenses={expenses} incomes={incomes} />
         <SummaryCards income={periodIncomes.reduce((sum, e) => sum + Number(e.amount), 0)} expenses={periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} budget={budget} remaining={budget - periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} />
@@ -330,16 +284,33 @@ function AppContent() {
 }
 
 function App() {
+  const { user, logout } = useAuth();
+  const [darkMode, setDarkMode] = React.useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
+
+  React.useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', darkMode);
+  }, [darkMode]);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/verify-email/:token" element={<VerifyEmail />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="*" element={<AppContent />} />
-      </Routes>
-    </Router>
+    <>
+      <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+      <Router>
+        <Routes>
+          <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
+          <Route path="/profile" element={<Profile user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
+          <Route path="/verify-email/:token" element={<VerifyEmail />} />
+          <Route path="/admin" element={<AdminPanel user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
+          <Route path="*" element={<AppContent user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 
