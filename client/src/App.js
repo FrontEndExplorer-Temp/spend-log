@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import SummaryCards from './SummaryCards';
 import ExpenseForm from './ExpenseForm';
 import ExpenseList from './ExpenseList';
@@ -28,6 +28,8 @@ import DatePeriodSelector from './DatePeriodSelector';
 import { useToast } from './ToastContext';
 import AdminPanel from './AdminPanel';
 import Navbar from './Navbar';
+import { Helmet } from 'react-helmet';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function ResetPasswordWrapper() {
   const { token } = useParams();
@@ -236,51 +238,58 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      <Navbar darkMode={darkMode} setDarkMode={setDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <DatePeriodSelector {...period} onChange={setPeriod} expenses={expenses} incomes={incomes} />
-        <SummaryCards income={periodIncomes.reduce((sum, e) => sum + Number(e.amount), 0)} expenses={periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} budget={budget} remaining={budget - periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} />
-        <TopCategories expenses={periodExpenses} incomes={periodIncomes} />
-        <BudgetProgressBar expenses={periodExpenses} budget={budget} />
-        <SummaryTrendsChart expenses={periodExpenses} incomes={periodIncomes} />
-        {activeTab === 'expenses' && (
-          <>
-            <ExpenseForm onAdd={handleAddExpense} />
-            <SearchBar value={search} onChange={setSearch} />
-            <Filters filters={filters} onChange={setFilters} onApply={handleApplyFilters} onClear={handleClearFilters} />
-            <BudgetInput budget={budget} onSave={handleSaveBudget} />
-            <ExpenseList expenses={filteredExpenses} onDelete={handleDeleteExpense} />
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <ExpenseChart expenses={filteredExpenses} />
+    <>
+      <Helmet>
+        <title>Dashboard | Spend Log</title>
+        <meta name="description" content="View your expense and income dashboard, charts, and summaries in Spend Log." />
+      </Helmet>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+        <Navbar darkMode={darkMode} setDarkMode={setDarkMode} activeTab={activeTab} setActiveTab={setActiveTab} />
+        <main className="max-w-4xl mx-auto px-4 py-8">
+          <DatePeriodSelector {...period} onChange={setPeriod} expenses={expenses} incomes={incomes} />
+          <SummaryCards income={periodIncomes.reduce((sum, e) => sum + Number(e.amount), 0)} expenses={periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} budget={budget} remaining={budget - periodExpenses.reduce((sum, e) => sum + Number(e.amount), 0)} />
+          <TopCategories expenses={periodExpenses} incomes={periodIncomes} />
+          <BudgetProgressBar expenses={periodExpenses} budget={budget} />
+          <Suspense fallback={<div>Loading charts...</div>}>
+            <SummaryTrendsChart expenses={periodExpenses} incomes={periodIncomes} />
+          </Suspense>
+          {activeTab === 'expenses' && (
+            <>
+              <ExpenseForm onAdd={handleAddExpense} />
+              <SearchBar value={search} onChange={setSearch} />
+              <Filters filters={filters} onChange={setFilters} onApply={handleApplyFilters} onClear={handleClearFilters} />
+              <BudgetInput budget={budget} onSave={handleSaveBudget} />
+              <ExpenseList expenses={filteredExpenses} onDelete={handleDeleteExpense} />
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1">
+                  <Suspense fallback={<div>Loading chart...</div>}>
+                    <ExpenseChart expenses={filteredExpenses} />
+                  </Suspense>
+                </div>
+                <div className="flex-1">
+                  <Suspense fallback={<div>Loading chart...</div>}>
+                    <ExpenseBarChart expenses={filteredExpenses} />
+                  </Suspense>
+                </div>
               </div>
-              <div className="flex-1">
-                <ExpenseBarChart expenses={filteredExpenses} />
-              </div>
-            </div>
-            <ExportSection expenses={filteredExpenses} />
-          </>
-        )}
-        {activeTab === 'income' && (
-          <>
-            <IncomeForm onAdd={handleAddIncome} />
-            <SearchBar value={incomeSearch} onChange={setIncomeSearch} />
-            <Filters filters={incomeFilters} onChange={setIncomeFilters} onApply={handleApplyIncomeFilters} onClear={handleClearIncomeFilters} />
-            <IncomeList incomes={filteredIncomes} onDelete={handleDeleteIncome} />
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
+              <ExportSection expenses={filteredExpenses} />
+            </>
+          )}
+          {activeTab === 'income' && (
+            <>
+              <IncomeForm onAdd={handleAddIncome} />
+              <Suspense fallback={<div>Loading chart...</div>}>
                 <IncomeChart incomes={filteredIncomes} />
-              </div>
-              <div className="flex-1">
+              </Suspense>
+              <Suspense fallback={<div>Loading chart...</div>}>
                 <IncomeBarChart incomes={filteredIncomes} />
-              </div>
-            </div>
-            <ExportIncomeSection incomes={filteredIncomes} />
-          </>
-        )}
-      </main>
-    </div>
+              </Suspense>
+              <ExportIncomeSection incomes={filteredIncomes} />
+            </>
+          )}
+        </main>
+      </div>
+    </>
   );
 }
 
@@ -300,15 +309,47 @@ function App() {
   }, [darkMode]);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
-        <Route path="/profile" element={<Profile user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
-        <Route path="/verify-email/:token" element={<VerifyEmail />} />
-        <Route path="/admin" element={<AdminPanel user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
-        <Route path="*" element={<AppContent />} />
-      </Routes>
-    </Router>
+    <>
+      <Helmet>
+        <title>Spend Log - Track Your Expenses & Income</title>
+        <meta name="description" content="Spend Log helps you track every penny, manage your expenses and income, and grow your savings." />
+        <meta property="og:title" content="Spend Log - Track Your Expenses & Income" />
+        <meta property="og:description" content="Spend Log helps you track every penny, manage your expenses and income, and grow your savings." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://yourdomain.com/" />
+        <meta property="og:image" content="https://yourdomain.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
+      <Router>
+        <AnimatePresence mode="wait">
+          <Routes>
+            <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
+            <Route path="/profile" element={<Profile user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />} />
+            <Route path="/verify-email/:token" element={<VerifyEmail />} />
+            <Route path="/admin" element={
+              <Suspense fallback={<div>Loading Admin Panel...</div>}>
+                <AdminPanel user={user} logout={logout} darkMode={darkMode} setDarkMode={setDarkMode} />
+              </Suspense>
+            } />
+            <Route path="/" element={
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <AppContent />
+              </motion.div>
+            } />
+            <Route path="/login" element={
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <Login />
+              </motion.div>
+            } />
+            <Route path="/register" element={
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <Register />
+              </motion.div>
+            } />
+          </Routes>
+        </AnimatePresence>
+      </Router>
+    </>
   );
 }
 
