@@ -4,7 +4,7 @@ import { useToast } from './ToastContext';
 import Navbar from './Navbar';
 
 function AdminPanel({ user, logout, darkMode, setDarkMode }) {
-  const { fetchWithAuth, user: currentUser } = useAuth();
+  const { fetchWithAuth } = useAuth();
   const { showToast } = useToast();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
