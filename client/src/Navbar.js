@@ -11,6 +11,7 @@ function Navbar({ darkMode, setDarkMode, activeTab, setActiveTab }) {
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow sticky top-0 z-10 transition-colors duration-300">
+      <a href="#main-content" className="sr-only focus:not-sr-only absolute left-2 top-2 bg-blue-600 text-white px-3 py-1 rounded z-50">Skip to main content</a>
       <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo and Slogan */}
         <div 
@@ -29,7 +30,7 @@ function Navbar({ darkMode, setDarkMode, activeTab, setActiveTab }) {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex gap-2 items-center">
+        <nav role="navigation" aria-label="Main navigation" className="flex gap-2 items-center">
           <button
             className="bg-blue-500 dark:bg-blue-700 text-white rounded px-3 py-2 font-semibold hover:bg-blue-600 dark:hover:bg-blue-800 transition"
             onClick={() => navigate('/')}
@@ -66,7 +67,7 @@ function Navbar({ darkMode, setDarkMode, activeTab, setActiveTab }) {
           >
             Logout
           </button>
-        </div>
+        </nav>
       </div>
 
       {/* Expenses/Income Tabs - Only show on main page */}
